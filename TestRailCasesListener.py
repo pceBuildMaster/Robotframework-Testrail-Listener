@@ -26,7 +26,6 @@ class TestRailCasesListener(TestRailListener):
         self.suite_queue.push(name, tr_section_id)
 
     def start_test(self, name, attrs):
-
         # last ID appended is the TR Section ID for this RF test
         section_id = self.suite_queue.current_id()
 

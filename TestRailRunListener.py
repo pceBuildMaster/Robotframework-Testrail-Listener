@@ -129,7 +129,7 @@ class TestRailRunListener(TestRailListener):
 
     def init_site_specific_info(self):
         '''
-        This method will need to be changed so as to make specific for each site.
+        This method will need to be changed to make it specific for each site.
 
         Retrieve info from RF used to name TR entities: Milestones, Plans. and Runs.
 
