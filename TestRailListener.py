@@ -5,10 +5,10 @@ from TestRailAPIClient import TestRailAPIClient
 from TestRailAPIClient import TestRailAPIError
 
 
-TESTRAIL_SERVER = 'testrail.pce.local'
-TESTRAIL_PROJECT_ID = 4
-TESTRAIL_USER = 'buildmaster@geistglobal.com'
-TESTRAIL_PW = '12345678'
+TESTRAIL_SERVER = 'testrail.example.com'  # Replace with actual testrail hostname
+TESTRAIL_PROJECT_ID = 1                   # Replace
+TESTRAIL_USER = 'buildmaster@example.com' # Replace
+TESTRAIL_PW = '12345678'                  # Replace
 
 
 class TestRailListener(object):
