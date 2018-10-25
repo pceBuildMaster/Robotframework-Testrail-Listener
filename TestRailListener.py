@@ -1,3 +1,4 @@
+import os
 import signal
 from robot.api import logger
 from robot.libraries.BuiltIn import BuiltIn
