@@ -60,7 +60,6 @@ class TestRailListener(object):
             self.auto_type = None
             self.user_id = None
 
-
     def start_suite(self, name, attrs):
         if 's1' == attrs['id']:
             # first suite encountered. open Listener log in RF output dir and connect to Testrail.
@@ -145,6 +144,9 @@ class ListenerLogger(object):
         if self._log_handle is not None:
             self._log_handle.write(msg)
         if console:
+            self.log_console(msg)
+
+    def log_console(self, msg):
             logger.console(msg)
 
     def close(self):

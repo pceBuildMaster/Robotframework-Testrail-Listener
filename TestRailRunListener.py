@@ -84,6 +84,7 @@ class TestRailRunListener(TestRailListener):
             # accessed until in a test context
             self.logger.open(self.logname)
             tr_section_id, msg = self.init_testrail_testsuite(name)
+            tests = attrs['tests']
         else:
             if 's1-s1' == attrs['id']:
                 # second suite encountered. top level RF suite setup has been executed. so init Listener data
@@ -93,11 +94,11 @@ class TestRailRunListener(TestRailListener):
                 self.init_testrail_plan()
                 self.logger.log('\nSuites:\n{}\n'.format(self.suite_queue.current_path()))
             # get tr section ID based on RF suite name
-            tr_section_id, msg = self.init_testrail_section(name)
+            tr_section_id, tests, msg = self.init_testrail_section(name, attrs['tests'])
         self.logger.log(msg)
         self.suite_queue.push(name, tr_section_id)
         # process this suite's data and tests if they exist
-        self.add_rf_suite_tests_to_tr_run(tr_section_id, attrs['tests'])
+        self.add_rf_suite_tests_to_tr_run(tr_section_id, tests)
 
     def end_test(self, name, attrs):
         # set TR Result data from RF attrs
@@ -112,8 +113,7 @@ class TestRailRunListener(TestRailListener):
             case_id = self.title2caseid[section_id][name]
         except KeyError:
             # log but do not quit.
-            self.logger.log('failed to get case ID)\n')
-            self.logger.log('\tLISTENER ERROR: get Case ID failed\n', console=True)
+            self.logger.log('{} [{}] ({}) - failed to get case ID\n'.format(attrs['status'], duration, msg))
             return
 
         # add TR Result
@@ -231,7 +231,7 @@ class TestRailRunListener(TestRailListener):
         return self.testsuite_id, 'Adding test results to Testrail from running RF testsuite: {}\n'.format(
                 rf_top_level_suite_name)
 
-    def init_testrail_section(self, rf_suite_name):
+    def init_testrail_section(self, rf_suite_name, tests):
         # last TR section ID pushed to suite queue is the parent of this RF suite name being processed.
         # but if that ID is also the testrail testsuite ID then this section has no parent id to be 
         # found or created under.
@@ -256,10 +256,13 @@ class TestRailRunListener(TestRailListener):
                 tr_section_id = tr_section['id']
 
         # should exist
-        if tr_section_id is None:
-            self.logger.log('LISTENER FATAL ERROR: failed to find Testrail section [{}]\n'.format(rf_suite_name), console=True)
-            self.signal_quit()
-        return tr_section_id, '{}.{}\n'.format(self.suite_queue.current_path(), rf_suite_name)
+        msg = '{}.{}'.format(self.suite_queue.current_path(), rf_suite_name)
+        if tr_section_id is not None:
+            return tr_section_id, tests, '{}\n'.format(msg)
+        else:
+            # log but do not quit run. return empty test case list to prevent attempt to add them to test run
+            self.logger.log_console('\nLISTENER ERROR: Failed to find Testrail section [{}]\n'.format(rf_suite_name))
+            return None, [], '{} - failed to get section id\n'.format(msg)
 
     def add_rf_suite_tests_to_tr_run(self, tr_section_id, rf_tests):
         if not rf_tests:
