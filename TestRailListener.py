@@ -5,11 +5,15 @@ from robot.libraries.BuiltIn import BuiltIn
 from TestRailAPIClient import TestRailAPIClient
 from TestRailAPIClient import TestRailAPIError
 
-
-TESTRAIL_SERVER = 'testrail.example.com'  # Replace with actual testrail hostname
-TESTRAIL_PROJECT_ID = 1                   # Replace
-TESTRAIL_USER = 'buildmaster@example.com' # Replace
-TESTRAIL_PW = '12345678'                  # Replace
+# import Testrail server info
+try:
+    from  TestRailServer import TESTRAIL_SERVER
+    from  TestRailServer import TESTRAIL_PROTOCOL
+    from  TestRailServer import TESTRAIL_PROJECT_ID
+    from  TestRailServer import TESTRAIL_USER
+    from  TestRailServer import TESTRAIL_PW
+except ImportError as e:
+    raise ValueError('TestRail server info not found in TestRailServer.py.  Error: {}'.format(e))
 
 
 class TestRailListener(object):
@@ -46,13 +50,23 @@ class TestRailListener(object):
         # suite queue and map
         self.suite_queue = SuiteQueue()
 
-        # Set testrail server info in some way. for now use hardcoded globals
-        self.project_id = TESTRAIL_PROJECT_ID
-        self.testrail_server = TESTRAIL_SERVER
-        self.testrail_user = TESTRAIL_USER
-        self.testrail_password = TESTRAIL_PW
+        # Set testrail server info
+        try:
+            self.project_id = TESTRAIL_PROJECT_ID
+            self.testrail_server = TESTRAIL_SERVER
+            self.testrail_user = TESTRAIL_USER
+            self.testrail_password = TESTRAIL_PW
+            protocol = TESTRAIL_PROTOCOL
+        except NameError as e:
+            raise ValueError('TestRail server info not found. Ensure TestRailServer.py exists and has needed info.  Error: {}'.format(e))
+            self.signal_quit()
+
         if self.testrail_server is not None:
-            self.testrail = TestRailAPIClient(self.testrail_server, user=self.testrail_user, password=self.testrail_password)
+            self.testrail = TestRailAPIClient(
+                    self.testrail_server,
+                    protocol=protocol,
+                    user=self.testrail_user,
+                    password=self.testrail_password)
             self.auto_type = self.testrail.get_automated_test_case_type()
             self.user_id = self.testrail.get_user_id(self.testrail_user)
         else:
