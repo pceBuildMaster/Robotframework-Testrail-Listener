@@ -1,11 +1,15 @@
 # Rename this file to TestRailServer.py and configure with correct TestRail server info
 from robot.libraries.BuiltIn import BuiltIn
 
-TESTRAIL_SERVER = 'testrail.example.com'
-TESTRAIL_PROTOCOL = 'http'  # http or https
-TESTRAIL_PROJECT_ID = 1
-TESTRAIL_USER = 'buildmaster@example.com'
-TESTRAIL_PW = '12345678'
+
+def get_testrail_srv_info():
+    tr_srv = {}
+    tr_srv['TESTRAIL_SERVER']     = 'testrail.example.com'
+    tr_srv['TESTRAIL_PROTOCOL']   = 'http' # http or https
+    tr_srv['TESTRAIL_PROJECT_ID'] = 1
+    tr_srv['TESTRAIL_USER']       = 'buildmaster@example.com'
+    tr_srv['TESTRAIL_PW']         = '12345678'
+    return tr_srv
 
 
 def set_testrail_names(logger):

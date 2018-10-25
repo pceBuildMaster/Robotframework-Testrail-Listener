@@ -7,13 +7,9 @@ from TestRailAPIClient import TestRailAPIError
 
 # import Testrail server info
 try:
-    from  TestRailServer import TESTRAIL_SERVER
-    from  TestRailServer import TESTRAIL_PROTOCOL
-    from  TestRailServer import TESTRAIL_PROJECT_ID
-    from  TestRailServer import TESTRAIL_USER
-    from  TestRailServer import TESTRAIL_PW
+    from  TestRailServer import get_testrail_srv_info
 except ImportError as e:
-    raise ValueError('TestRail server info not found in TestRailServer.py.  Error: {}'.format(e))
+    raise ValueError('Function not imported from TestRailServer.py.  Error: {}'.format(e))
 
 
 class TestRailListener(object):
@@ -52,13 +48,17 @@ class TestRailListener(object):
 
         # Set testrail server info
         try:
-            self.project_id = TESTRAIL_PROJECT_ID
-            self.testrail_server = TESTRAIL_SERVER
-            self.testrail_user = TESTRAIL_USER
-            self.testrail_password = TESTRAIL_PW
-            protocol = TESTRAIL_PROTOCOL
-        except NameError as e:
-            raise ValueError('TestRail server info not found. Ensure TestRailServer.py exists and has needed info.  Error: {}'.format(e))
+            srv_info = get_testrail_srv_info()
+        except Exception as e:
+            raise ValueError('Getting TestRail server info failed: {}.'.format(e))
+        try:
+            self.project_id        = srv_info['TESTRAIL_PROJECT_ID']
+            self.testrail_server   = srv_info['TESTRAIL_SERVER']
+            self.testrail_user     = srv_info['TESTRAIL_USER']
+            self.testrail_password = srv_info['TESTRAIL_PW']
+            protocol               = srv_info['TESTRAIL_PROTOCOL']
+        except KeyError as e:
+            raise ValueError('TestRail server value for {} not found. Ensure TestRailServer.py exists and has needed info.'.format(e))
             self.signal_quit()
 
         if self.testrail_server is not None:
