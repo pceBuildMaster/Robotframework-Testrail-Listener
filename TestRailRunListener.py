@@ -1,6 +1,13 @@
-from robot.libraries.BuiltIn import BuiltIn
 from TestRailAPIClient import TestRailAPIError
 from TestRailListener import TestRailListener
+
+# import site specific function
+# used to define the names used in Testrail for Milestone, Plan, and Run from an RF test run
+try:
+    from  TestRailServer import set_testrail_names
+except ImportError as e:
+    raise ValueError('Function to set TestRail name not found in TestRailServer.py.  Error: {}'.format(e))
+
 
 # used for running debugger:
 #import sys
@@ -69,13 +76,6 @@ class TestRailRunListener(TestRailListener):
         self.entry_id = None
         self.result_status_ids = {'PASS': 1, 'FAIL': 5}
 
-        # Site specific DUT/test run info
-        self.model = None
-        self.platform = None
-        self.fw_version = None
-        self.mac = None
-        self.run_title = None
-        self.run_protocol = None
 
     def start_suite(self, name, attrs):
         if 's1' == attrs['id']:
@@ -129,43 +129,10 @@ class TestRailRunListener(TestRailListener):
 
     def init_site_specific_info(self):
         '''
-        This method will need to be changed to make it specific for each site.
-
-        Retrieve info from RF used to name TR entities: Milestones, Plans. and Runs.
-
-        For this site RF is run on release canidate builds installed on each model/formfactor DUT
-        supported for release.
-
-        So each TR Milestone is named from release internal name - RC version.
-
-        Each model/formfactor test is contained in TR Test Plan with name from
-        model - release name version and DUT MAC for uniqueness
-
-        Each TR Test Run in the Plans are the type of RF run: GUI, API, etc.
+        This method calls a function defined in TestRailServer.py.
+        This allows site specific details to be defined outside the class code.
         '''
-        # get info from RF to ID/create Testrail Milestone, test Plan, and test Run
-        self.model        = BuiltIn().get_variable_value("$DUTMODELTYPE")     # RCX/GU2.0 36
-        self.platform     = BuiltIn().get_variable_value("$DUTPLATFORM")      # Raven/Blackbird
-        self.fw_version   = BuiltIn().get_variable_value("$GEIST VERSION")    # 5.3.0-RC5
-        self.mac          = BuiltIn().get_variable_value("$GEIST DEVICE MAC") # 00:19:85:00:ad:20
-        self.run_title    = BuiltIn().get_variable_value("$TESTTITLE")        # toucan/aPI
-        self.run_protocol = BuiltIn().get_variable_value("$HTTP ACCESS")      # http/https
-
-        # log what data is being used for this run
-        site_specifc_info1 = ' - Model: {}\n - Platform: {}\n - Version: {}\n'.format(
-                self.model, self.platform, self.fw_version)
-        site_specifc_info2 = ' - MAC: {}\n - Title: {}\n - Protocol: {}\n'.format(
-                self.mac, self.run_title, self.run_protocol)
-        self.logger.log('{}{}'.format(site_specifc_info1, site_specifc_info2))
-
-        # set names of Testrail entries used
-        #
-        # e.g Raven - 5.3.0-RC5
-        self.milestone = '{} - {}'.format(self.platform, self.fw_version)
-        # e.g RCX - Raven 5.3.0-RC5 [00:19:85:00:ad:20]
-        self.plan      = '{} - {} {} [{}]'.format(self.model, self.platform, self.fw_version, self.mac)
-        # e.g toucan (https) [RCX - Raven 5.3.0-RC5]
-        self.run       = '{} ({}) [{} - {} {}]'.format(self.run_title, self.run_protocol, self.model, self.platform, self.fw_version)
+        self.milestone, self.plan, self.run = set_testrail_names(self.logger)
 
     def init_testrail_milestone(self):
         # get milestone ID if it already exists
@@ -233,7 +200,7 @@ class TestRailRunListener(TestRailListener):
 
     def init_testrail_section(self, rf_suite_name, tests):
         # last TR section ID pushed to suite queue is the parent of this RF suite name being processed.
-        # but if that ID is also the testrail testsuite ID then this section has no parent id to be 
+        # but if that ID is also the testrail testsuite ID then this section has no parent id to be
         # found or created under.
         cur_parent_id = self.suite_queue.current_id()
         if cur_parent_id == self.testsuite_id:
@@ -249,7 +216,7 @@ class TestRailRunListener(TestRailListener):
         # find current section ID if it exists ensuring parent_id is correct.
         # tr_section['parent_id'] will be None if this is a top-level TR section.
         # this is so sections with the same name but in different places do not get
-        # used just becasue they were seen first.
+        # used just because they were seen first.
         tr_section_id = None
         for tr_section in tr_sections:
             if rf_suite_name == tr_section['name'] and cur_parent_id == tr_section['parent_id']:
