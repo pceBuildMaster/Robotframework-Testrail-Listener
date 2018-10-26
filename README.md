@@ -19,7 +19,7 @@ Milestones, Plans, and Runs with tests and add results as tests are executed.
 ## Install
 
 1. Download or clone code where it can be placed in your python path
-  * RF robot can be called with <--pythonpath [path to code]>
+  * RF robot can be called with `--pythonpath [path to code]`
 2. Copy site specific file RENAME_TestRailServer.py to TestRailServer.py
   * This file will contain your site specific settings.
   * By copying it future updates to Listener will not overwrite your settings.
@@ -46,6 +46,7 @@ the each of the RF testsuites would be run, API, System, GUI.  These would be th
 
 So TestRail will end up with these entities:
 
+```
 FooBar 1.3 RC2 (Milestone)
 ├── Gizmo (Plan)
 │   ├── API (Run)
@@ -55,6 +56,7 @@ FooBar 1.3 RC2 (Milestone)
     ├── API (Run)
     ├── GUI (Run)
     └── System (Run)
+```
 
 It does this by:
 
@@ -82,9 +84,9 @@ throw an error if this is not the case if a second test suite creation is attemp
 1. Run RF with TestRailCasesListener for each suite you want to support.
   * in example above this would be for API, GUI, and System
 
-  <robot --listener TestRailCasesListener --dryrun system>
+  `robot --listener TestRailCasesListener --dryrun system`
 
 2. Run RF with TestRailRunListener for each model/run needed.
 
-  <robot --listener TestRailRunListener system>
+  `robot --listener TestRailRunListener system`
 
