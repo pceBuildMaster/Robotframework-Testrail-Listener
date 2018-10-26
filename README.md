@@ -13,8 +13,10 @@ There are two RF Listeners which inherit from a base Listener:
 Milestones, Plans, Runs, Tests, and Results are added as tests are executed. The names 
 of Milestones, Plans, and Runs are set by logic in the Listener.
 
-The names of Testsuite Sections and Cases will be what RF determines.  In this way TestRail will reflect
-the structure of your Robot Framework suites and the results will reflect how RF is run.
+The names of Testsuite Sections and Cases will be what RF determines.  
+
+In this way TestRail will reflect the structure of your Robot Framework suites and the 
+results will reflect how RF is run.
 
 **TestRailListener.py** is the base class for the other two Listeners that do the work
 
