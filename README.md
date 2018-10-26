@@ -10,7 +10,9 @@ There are two RF Listeners which inherit from a base Listener:
 2. **TestRailRunListener.py**
   * Use during normal robot test runs to add results to Testrail 
 
-Milestones, Plans, and Runs with tests and add results as tests are executed.
+Milestones, Plans, and Runs with tests and add results as tests are executed. The names of 
+Testsuite Sections and Cases will be what RF determines.  In this way TestRail will reflect
+the structure of your Robot Framework suites.
 
 **TestRailListener.py** is the base class for the other two Listeners that do the work
 
@@ -20,12 +22,12 @@ Milestones, Plans, and Runs with tests and add results as tests are executed.
 
 1. Download or clone code where it can be placed in your python path
   * RF robot can be called with `--pythonpath [path to code]`
-2. Copy site specific file RENAME_TestRailServer.py to TestRailServer.py
+2. Copy site specific file **RENAME_TestRailServer.py** to **TestRailServer.py**
   * This file will contain your site specific settings.
   * By copying it future updates to Listener will not overwrite your settings.
-3. Configure in TestRailServer.py function **get_testrail_srv_info()** with your TestRail server info
+3. Configure in **TestRailServer.py** function **get_testrail_srv_info()** with your TestRail server info
   * Review file for details on what changes are needed
-4. Configure in TestRailServer.py function **set_testrail_name()** with your logic on how TestRail entities will be named for each test run
+4. Configure in **TestRailServer.py** function **set_testrail_name()** with your logic on how TestRail entities will be named for each test run
   * Review file for details on what changes are needed
 
 It is recommended a temperory TestRail Project be created to test with.  This project can be delelted when ready
@@ -44,16 +46,16 @@ for production runs.  Note Project ID will need to be updated in TestRailServer.
 
 ## Design Overview
 
-During an RF run the TestRailRunListener will be called to update test results. Design of Listener is
-TR Tests are created in TR Run.  The Run will be created in a TR Plan.  One will be created if it does not exist.
+During an RF run the TestRailRunListener will be called to update test results. Listener is designed so
+TR Tests are created in a TR Run.  The Run will be created in a TR Plan.  One will be created if it does not exist.
 The Plan is tied to a TR Milestone.  It also will be created if it does not exist.
 
 The names used for the TestRail entities, Milestone, Plan, and Run are determined by the site specific logic 
-configured in TestRailServer.py
+configured in **TestRailServer.py**
 
 An example usage would be the testing of a Release Canidate, e.g. FooBar 1.3 RC2, which would be the Milestone name.
 For the testing cycle two models will be tested, Gizmo, and TNBT.  These would be the Plan names.  For each model 
-the each of the RF testsuites would be run, API, System, GUI.  These would be the Run names.
+each of the RF testsuites would be run, API, System, GUI.  These would be the Run names.
 
 So TestRail will end up with these entities:
 
