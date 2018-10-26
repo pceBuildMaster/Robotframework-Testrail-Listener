@@ -31,6 +31,17 @@ Milestones, Plans, and Runs with tests and add results as tests are executed.
 It is recommended a temperory TestRail Project be created to test with.  This project can be delelted when ready
 for production runs.  Note Project ID will need to be updated in TestRailServer.py.
 
+## Operation
+
+1. Run RF with TestRailCasesListener for each suite you want to support.
+  * in example above this would be for API, GUI, and System
+
+  `robot --listener TestRailCasesListener --dryrun system`
+
+2. Run RF with TestRailRunListener for each model/run needed.
+
+  `robot --listener TestRailRunListener system`
+
 ## Design Overview
 
 During an RF run the TestRailRunListener will be called to update test results. Design of Listener is
@@ -61,12 +72,15 @@ FooBar 1.3 RC2 (Milestone)
 It does this by:
 
 1. Create the Milestone and get its ID
-  * on future runs only the ID will be obtained
 2. Create the Plan for the model that is run first and get its ID
 3. Create a Run in the Plan
 4. As RF enters each new subsuite create a section in the Run and create all the Tests found
 in the same section in the TR suite.
 5. As each Test is completed update the Result in the Test.
+
+On each future run, depending on how you setup the code, if a run uses an existing Milestone or Plan name, 
+the Listener will use them.  The Run is created each time, even if it has the same name as an existing one.
+This is allowed by TR since it uses unique IDs for all entities.
 
 TestRailRunListener does not create Cases as it goes; it only creates Tests from existing Cases. If a Case is
 missing the Listener will skip it and print a warning in the TR log it creates on each run.
@@ -78,15 +92,4 @@ your RF suites.
 The TestRailCasesListener can be run at any time.  It will ignore existing Cases and only create new ones.
 Currently the design assumes the TR Project is configured to use multiple test suites to manage cases.  It will 
 throw an error if this is not the case if a second test suite creation is attempted otherwise.
-
-## Operation
-
-1. Run RF with TestRailCasesListener for each suite you want to support.
-  * in example above this would be for API, GUI, and System
-
-  `robot --listener TestRailCasesListener --dryrun system`
-
-2. Run RF with TestRailRunListener for each model/run needed.
-
-  `robot --listener TestRailRunListener system`
 
