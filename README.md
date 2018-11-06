@@ -11,7 +11,7 @@ There are two RF Listeners which inherit from a base Listener:
   * Use during normal robot test runs to add results to Testrail 
 
 Milestones, Plans, Runs, Tests, and Results are added as tests are executed. The names 
-of Milestones, Plans, and Runs are set by logic in the Listener.
+of Milestones, Plans, and Runs are set by logic in the Listener. (see Install below)
 
 The names of Testsuite Sections and Cases will be what RF determines.  
 
